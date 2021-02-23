@@ -25,6 +25,13 @@ When data is sent from the client to the back end it comes in a property: `reque
 
 
 // ============== Packages ==============================
+// let req = [];
+
+// const errormessage = {
+//   status: 500,
+//   responseText: "Sorry, something went wrong",
+// };
+
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -38,14 +45,23 @@ const PORT = process.env.PORT || 3009;
 
 
 // ============== Routes ================================
+
+// function checkInput(req) {
+//   if (!req.query) {
+//     // console.log(errormessage);
+//     res.send(errormessage);
+
+//   }
+// }
+
 app.get('/location', handleGetLocation);
 function handleGetLocation(req, res) {
   console.log(req.query);
   const dataFromTheFile = require('./data/location.json');
 
   // const output = {
-  //   search_query: '',
-  //   formatted_query: '',
+  //   search_query: 'Seattle',
+  //   formatted_query: 'Seattle, WA, USA',
   //   latitude: dataFromTheFile[0].lat,
   //   longitude: dataFromTheFile[0].lon
   // };
@@ -63,6 +79,43 @@ function Location(dataFromTheFile, cityName) {
   this.longitude = dataFromTheFile[0].lon;
 }
 
+
+
+
+app.get('/weather', handleWeatherRequest);
+
+function handleWeatherRequest(req, res) {
+  const weatherJSON = require('./data/weather.json');
+
+  // const output2 = [
+  //   {
+  //     "forecast": "Partly cloudy until afternoon.",
+  //     "time": "Mon Jan 01 2001"
+  //   },
+  //   {
+  //     "forecast": "Mostly cloudy in the morning.",
+  //     "time": "Tue Jan 02 2001"
+  //   },
+  // ];
+
+
+  const output2 = [];
+
+  for (let i = 0; i < weatherJSON.data.length; i++) {
+    output2.push(new Weather(weatherJSON.data[i]));
+  }
+
+
+
+  res.send(output2);
+
+}
+
+function Weather(object) {
+  this.forecast = object.weather.description;
+  this.time = object.datetime;
+
+}
 
 app.get('/restaurants', handleGetRestaurants);
 
