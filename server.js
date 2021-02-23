@@ -25,12 +25,11 @@ When data is sent from the client to the back end it comes in a property: `reque
 
 
 // ============== Packages ==============================
-// let req = [];
 
-// const errormessage = {
-//   status: 500,
-//   responseText: "Sorry, something went wrong",
-// };
+const errormessage = {
+  status: 500,
+  responseText: "Sorry, something went wrong",
+};
 
 const express = require('express');
 const cors = require('cors');
@@ -46,16 +45,18 @@ const PORT = process.env.PORT || 3009;
 
 // ============== Routes ================================
 
-// function checkInput(req) {
-//   if (!req.query) {
-//     // console.log(errormessage);
-//     res.send(errormessage);
+function checkInput(reqHandedIntoFunction, resHandedIntoFunction) {
+  if (!reqHandedIntoFunction.query) {
+    // console.log(errormessage);
+    resHandedIntoFunction.send(errormessage);
 
-//   }
-// }
+  }
+}
 
 app.get('/location', handleGetLocation);
+
 function handleGetLocation(req, res) {
+  checkInput(req, res);
   console.log(req.query);
   const dataFromTheFile = require('./data/location.json');
 
@@ -66,17 +67,23 @@ function handleGetLocation(req, res) {
   //   longitude: dataFromTheFile[0].lon
   // };
 
-  const output = new Location(dataFromTheFile, req.query.city);
+
+  const output = [];
+
+  for (let i = 0; i < dataFromTheFile.length; i++) {
+    output.push(new Location(dataFromTheFile[0], req.query.city));
+  }
+  // const output = new Location(dataFromTheFile, req.query.city);
 
   res.send(output);
 
 }
 
-function Location(dataFromTheFile, cityName) {
+function Location(hereNow, cityName) {
   this.search_query = cityName;
-  this.formatted_query = dataFromTheFile[0].display_name;
-  this.latitude = dataFromTheFile[0].lat;
-  this.longitude = dataFromTheFile[0].lon;
+  this.formatted_query = hereNow.display_name;
+  this.latitude = hereNow.lat;
+  this.longitude = hereNow.lon;
 }
 
 
@@ -85,8 +92,8 @@ function Location(dataFromTheFile, cityName) {
 app.get('/weather', handleWeatherRequest);
 
 function handleWeatherRequest(req, res) {
+  checkInput(req, res);
   const weatherJSON = require('./data/weather.json');
-
   // const output2 = [
   //   {
   //     "forecast": "Partly cloudy until afternoon.",
@@ -97,18 +104,12 @@ function handleWeatherRequest(req, res) {
   //     "time": "Tue Jan 02 2001"
   //   },
   // ];
-
-
   const output2 = [];
 
   for (let i = 0; i < weatherJSON.data.length; i++) {
     output2.push(new Weather(weatherJSON.data[i]));
   }
-
-
-
   res.send(output2);
-
 }
 
 function Weather(object) {
