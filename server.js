@@ -1,8 +1,8 @@
 // ============== Packages ==============================
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
 const superagent = require('superagent');
+require('dotenv').config();
 
 
 // ============== App ===================================
@@ -18,7 +18,7 @@ const PARKS_API_KEY = process.env.PARKS_API_KEY;
 app.get('/location', handleGetLocation);
 app.get('/weather', handleWeatherRequest);
 app.get('/parks', handleGetParks);
-app.get('/restaurants', handleGetRestaurants);
+// app.get('/restaurants', handleGetRestaurants);
 
 function handleGetLocation(req, res) {
   const city = req.query.city;
@@ -40,11 +40,12 @@ function Location(hereNow, cityName) {
 }
 
 function handleWeatherRequest(req, res) {
-  // const cityName = req.query.search_query;
-  const lat = req.query.latitude;
-  const lon = req.query.longitude;
-  let url3 = `https://api.weatherbit.io/v2.0/daily?lat=${lat}&lon=${lon}&key=${WEATHER_API_KEY}&include=minutely`;
-  // let url3 = `https://api.weatherbit.io/v2.0/daily?city=${cityName}&key=${WEATHER_API_KEY}&include=minutely`;
+  const cityName = req.query.search_query;
+  console.log('THIS IS THE CITY NAME VARIABLE OK KKKKKKKKKS', cityName);
+  // const lat = req.query.latitude;
+  // const lon = req.query.longitude;
+  // let url3 = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${lat}&lon=${lon}&key=${WEATHER_API_KEY}&include=minutely`;
+  let url3 = `https://api.weatherbit.io/v2.0/forecast/daily?city=${cityName}&key=${WEATHER_API_KEY}&include=minutely`;
   superagent.get(url3)
     .then(stuffThatComesBack2 => {
       const weatherLiveArray = stuffThatComesBack2.body.data.map(day => new Weather(day));
