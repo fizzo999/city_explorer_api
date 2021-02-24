@@ -29,7 +29,7 @@ we use a Javascript server.js file that utilizes the libraries express and cors 
  thank you for helping with a debug issue to James Mansour. 
 
 
-Number and name of feature: 2 GET routes and jason data formatted correctly
+Number and name of feature: 2 GET routes and 2 x json data formatted correctly
 
 Estimate of time needed to complete: 4:00 HRS
 
@@ -38,3 +38,27 @@ Start time: 2:00 PM
 Finish time: 4:30 PM
 
 Actual time needed to complete: 2,5 HRS
+
+<hr>
+
+Number and name of feature: code review with Barrett Nance
+
+Estimate of time needed to complete: 1 HOUR
+
+Start time: 2:15PM
+
+Finish time: 3:15PM
+
+Actual time needed to complete: 1 HOUR
+
+<hr>
+
+Number and name of feature: code review with Barrett Nance
+
+Estimate of time needed to complete: 1 HOUR
+
+Start time: 2:15PM
+
+Finish time: 3:15PM
+
+Actual time needed to complete: 1 HOUR
