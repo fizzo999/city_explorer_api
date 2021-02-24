@@ -26,90 +26,95 @@ When data is sent from the client to the back end it comes in a property: `reque
 
 // ============== Packages ==============================
 
-const errormessage = {
-  status: 500,
-  responseText: "Sorry, something went wrong",
-};
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const superagent = require('superagent');
 
 
 // ============== App ===================================
 const app = express();
 app.use(cors());
-const PORT = process.env.PORT || 3009;
+const PORT = process.env.PORT || 3010;
+const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+const PARKS_API_KEY = process.env.PARKS_API_KEY;
+// const RESTAURANT_API_KEY = process.env.RESTAURANT_API_KEY;
 
 
 
 // ============== Routes ================================
 
-function checkInput(reqHandedIntoFunction, resHandedIntoFunction) {
-  if (!reqHandedIntoFunction.query) {
-    // console.log(errormessage);
-    resHandedIntoFunction.send(errormessage);
-
-  }
-}
-
 app.get('/location', handleGetLocation);
-
 function handleGetLocation(req, res) {
-  checkInput(req, res);
-  console.log(req.query);
-  const dataFromTheFile = require('./data/location.json');
+  // console.log(req.query);
+  // const dataFromTheFile = require('./data/location.json');
+  // let searchstring = req.query;
+  const city = req.query.city;
+  let url1 = `https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${city}&format=json`;
 
-  // const output = {
-  //   search_query: 'Seattle',
-  //   formatted_query: 'Seattle, WA, USA',
-  //   latitude: dataFromTheFile[0].lat,
-  //   longitude: dataFromTheFile[0].lon
-  // };
+  superagent.get(url1)
+    .then(stuffThatComesBack => {
+      // console.log('!!!!!!!!!!!!!!!!!!', stuffThatComesBack.body);
+      const output = new Location(stuffThatComesBack.body, req.query.city);
+      // console.log(stuffThatComesBack.body);
+      res.send(output);
+    });
 
-
-  const output = [];
-
-  for (let i = 0; i < dataFromTheFile.length; i++) {
-    output.push(new Location(dataFromTheFile[0], req.query.city));
-  }
+  // for (let i = 0; i < dataFromTheFile.length; i++) {
+  //   output.push(new Location(dataFromTheFile[0], req.query.city));
+  // }
   // const output = new Location(dataFromTheFile, req.query.city);
-
-  res.send(output);
-
+  // res.send(output);
 }
-
 function Location(hereNow, cityName) {
   this.search_query = cityName;
-  this.formatted_query = hereNow.display_name;
-  this.latitude = hereNow.lat;
-  this.longitude = hereNow.lon;
+  this.formatted_query = hereNow[0].display_name;
+  this.latitude = hereNow[0].lat;
+  this.longitude = hereNow[0].lon;
 }
 
-
-
-
 app.get('/weather', handleWeatherRequest);
-
 function handleWeatherRequest(req, res) {
-  checkInput(req, res);
-  const weatherJSON = require('./data/weather.json');
-  // const output2 = [
-  //   {
-  //     "forecast": "Partly cloudy until afternoon.",
-  //     "time": "Mon Jan 01 2001"
-  //   },
-  //   {
-  //     "forecast": "Mostly cloudy in the morning.",
-  //     "time": "Tue Jan 02 2001"
-  //   },
-  // ];
-  const output2 = [];
 
-  for (let i = 0; i < weatherJSON.data.length; i++) {
-    output2.push(new Weather(weatherJSON.data[i]));
-  }
-  res.send(output2);
+
+  const lat = req.query.latitude;
+  const lon = req.query.longitude;
+  let url3 = `https://api.weatherbit.io/v2.0/current?lat=${lat}&lon=${lon}&key=${WEATHER_API_KEY}&include=minutely`;
+  superagent.get(url3)
+    .then(stuffThatComesBack2 => {
+      console.log('line 85 !!!!!!', stuffThatComesBack2.body);
+      const weatherLiveArray = [];
+      weatherLiveArray.push(new Weather(stuffThatComesBack2.body.data[0], req.query.city));
+      console.log('this is line 86', weatherLiveArray);
+      res.send(weatherLiveArray);
+    })
+    .catch(errorThatComesBack => {
+      console.log(errorThatComesBack);
+      res.status(500).send('Sorry something went wrong');
+    });
+
+  // ==========for my own reference to understand map functions better - here is three different ways to write the same code !!!===========
+
+  // const weatherLiveArray = weatherJSON.data.map(stuffFromWeatherJSON => new Weather(stuffFromWeatherJSON));
+
+  // const weatherLiveArray = weatherJSON.data.map(callback1);
+  // function callback1(dataFromTheWeather) {
+  //   return new Weather(dataFromTheWeather);
+  // }
+
+  // const weatherLiveArray = [];
+  // weatherJSON.data.map(callback1);
+  // function callback1(dataFromTheWeather) {
+  //   weatherLiveArray.push(new Weather(dataFromTheWeather));
+  // }
+
+  // const output2 = [];
+  // for (let i = 0; i < weatherJSON.data.length; i++) {
+  //   output2.push(new Weather(weatherJSON.data[i]));
+  // }
+  // res.send(output2);
+  // res.send(weatherLiveArray);
 }
 
 function Weather(object) {
@@ -117,6 +122,42 @@ function Weather(object) {
   this.time = object.datetime;
 
 }
+
+app.get('/parks', handleGetParks);
+function handleGetParks(req, res) {
+
+  const lat = req.query.latitude;
+  const lon = req.query.longitude;
+
+
+  let url4 = `https://developer.nps.gov/api/v1/parks?q=${req.query.city}&api_key=${PARKS_API_KEY}`;
+  superagent.get(url4)
+    .then(stuffThatComesBack3 => {
+      console.log('line 136 !!!!!!', stuffThatComesBack3.body);
+      const natParksArray = [];
+      for (let i = 0; i < stuffThatComesBack3.body.data.length; i++) {
+        natParksArray.push(new Parks(stuffThatComesBack3.body.data[0]));
+      }
+      console.log('this is line 139', natParksArray);
+      res.send(natParksArray);
+    })
+    .catch(errorThatComesBack => {
+      console.log(errorThatComesBack);
+      res.status(500).send('Sorry something went wrong with the PARKS');
+    });
+}
+
+function Parks(object) {
+  this.name = object.fullName;
+  this.address = object.addresses[0].line1;
+  this.fee = object.fees;
+  this.description = object.description;
+  this.landscape = 'e';
+  this.url = object.url;
+}
+
+
+
 
 app.get('/restaurants', handleGetRestaurants);
 
