@@ -18,7 +18,6 @@ const PARKS_API_KEY = process.env.PARKS_API_KEY;
 app.get('/location', handleGetLocation);
 app.get('/weather', handleWeatherRequest);
 app.get('/parks', handleGetParks);
-app.get('/restaurants', handleGetRestaurants);
 
 function handleGetLocation(req, res) {
   const city = req.query.city;
@@ -54,25 +53,52 @@ function handleWeatherRequest(req, res) {
       console.log(errorThatComesBack);
       res.status(500).send('Sorry something went wrong with WEATHER');
     });
+
+  // ==========for my own reference to understand map functions better - here is three different ways to write the same code !!!===========
+
+  // const weatherLiveArray = weatherJSON.data.map(stuffFromWeatherJSON => new Weather(stuffFromWeatherJSON));
+
+  // const weatherLiveArray = weatherJSON.data.map(callback1);
+  // function callback1(dataFromTheWeather) {
+  //   return new Weather(dataFromTheWeather);
+  // }
+
+  // const weatherLiveArray = [];
+  // weatherJSON.data.map(callback1);
+  // function callback1(dataFromTheWeather) {
+  //   weatherLiveArray.push(new Weather(dataFromTheWeather));
+  // }
+
+  // const output2 = [];
+  // for (let i = 0; i < weatherJSON.data.length; i++) {
+  //   output2.push(new Weather(weatherJSON.data[i]));
+  // }
+  // res.send(output2);
+  // res.send(weatherLiveArray);
 }
 
-function Weather(weatherData) {
-  this.forecast = weatherData.weather.description;
-  this.time = weatherData.datetime;
+function Weather(object) {
+  this.forecast = object.weather.description;
+  this.time = object.datetime;
+
 }
+
 
 function handleGetParks(req, res) {
-  const parkCode = req.query.formatted_query;
-  // const lat = req.query.latitude;
-  // const lon = req.query.longitude;
-  const url4 = `https://developer.nps.gov/api/v1/parks?q=${parkCode}&api_key=${PARKS_API_KEY}`;
+
+  const lat = req.query.latitude;
+  const lon = req.query.longitude;
+
+
+  let url4 = `https://developer.nps.gov/api/v1/parks?q=${req.query.city}&api_key=${PARKS_API_KEY}`;
   superagent.get(url4)
     .then(stuffThatComesBack3 => {
-      // const natParksArray = [];
-      const natParksArray = stuffThatComesBack3.body.data.map(park => new Parks(park))
-      // for (let i = 0; i < stuffThatComesBack3.body.data.length; i++) {
-      //   natParksArray.push(new Parks(stuffThatComesBack3.body.data[0]));
-      // }
+      console.log('line 136 !!!!!!', stuffThatComesBack3.body);
+      const natParksArray = [];
+      for (let i = 0; i < stuffThatComesBack3.body.data.length; i++) {
+        natParksArray.push(new Parks(stuffThatComesBack3.body.data[0]));
+      }
+      console.log('this is line 139', natParksArray);
       res.send(natParksArray);
     })
     .catch(errorThatComesBack => {
@@ -81,26 +107,37 @@ function handleGetParks(req, res) {
     });
 }
 
-function Parks(parksData) {
-  this.name = parksData.fullName;
-  this.address = parksData.addresses[0].line1;
-  this.fee = parksData.fees;
-  this.description = parksData.description;
-  this.url = parksData.url;
+function Parks(object) {
+  this.name = object.fullName;
+  this.address = object.addresses[0].line1;
+  this.fee = object.fees;
+  this.description = object.description;
+  this.landscape = 'e';
+  this.url = object.url;
 }
 
+
+
+
+app.get('/restaurants', handleGetRestaurants);
+
 function handleGetRestaurants(req, res) {
-  const city = req.query.city;
-  // const url5 = `https://developer.nps.gov/api/v1/parks?q=${city}&api_key=${RESTAURANT_API_KEY}`;
-  superagent.get(url5)
-    .then(stuffThatComesBack4 => {
-      const restaurantsArray = stuffThatComesBack4.body.data.map(restaurant => new Parks(restaurant))
-      res.send(restaurantsArray);
-    })
-    .catch(errorThatComesBack => {
-      console.log(errorThatComesBack);
-      res.status(500).send('Sorry something went wrong with the RESTAURANTS');
-    });
+
+  const restaurantJSON = require('./data/restaurants.json');
+
+  // const firstRest = {
+  //   name: restaurantJSON.nearby_restaurants[0].restaurant.name,
+  //   area: restaurantJSON.nearby_restaurants[0].restaurant.location.locality_verbose,
+  //   // Cannot read property 'locality_verbose' of undefined // the thing to the left is undefined
+  //   cuisines: restaurantJSON.nearby_restaurants[0].restaurant.cuisines,
+  // };
+
+  const output = [];
+  for (let i = 0; i < restaurantJSON.nearby_restaurants.length; i++) {
+    output.push(new Restaurant(restaurantJSON.nearby_restaurants[i].restaurant));
+  }
+
+  res.send(output);
 }
 // ============== Initialization ========================
 app.listen(PORT, () => console.log(`app is up on port http://localhost:${PORT}`)); // this is what starts the server
