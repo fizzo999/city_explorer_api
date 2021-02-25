@@ -26,7 +26,6 @@ app.get('/parks', handleGetParks);
 
 function handleGetLocation(req, res) {
   const city = req.query.city;
-  console.log(city);
   let url1 = `https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${city}&format=json`;
   superagent.get(url1)
     .then(stuffThatComesBack => {
