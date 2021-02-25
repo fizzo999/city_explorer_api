@@ -26,29 +26,7 @@ app.get('/parks', handleGetParks);
 
 function handleGetLocation(req, res) {
   const city = req.query.city;
-  // console.log('This is theeeeeeeeeeeeeeeeeeeeee input', req.query, req.query.city);
-  const sqlCheckingString = 'SELECT * FROM previous_requests WHERE name=$1';
-  const sqlCheckingArray = [req.query.name];
-
-  client.query(sqlCheckingString, sqlCheckingArray)
-    .then(stuffThatComesBackFromPostgresql => {
-      console.log('HERE IS THE STUFF FROM SQL ', stuffThatComesBackFromPostgresql);
-      if (stuffThatComesBackFromPostgresql.rows.length > 0) {
-        //dont even bother
-        console.log('Yooooohooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
-        res.send('yo you are already in the class, get outta here');
-      } else {
-        console.log('we dont have that stuff yet ====================================================');
-        const sqlString = 'INSERT INTO previous_requests (name, prev_latitude, prev_longitude, date) VALUES ($1, $2, $3, $4)';
-        const sqlArray = [req.query.name, req.query.fav_book, req.query.class];
-
-        client.query(sqlString, sqlArray)
-          .then(() => {
-            res.redirect('/');
-          });
-      }
-    });
-
+  console.log(city);
   let url1 = `https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${city}&format=json`;
   superagent.get(url1)
     .then(stuffThatComesBack => {
@@ -114,12 +92,8 @@ function handleGetParks(req, res) {
 function Parks(parksData) {
   this.name = parksData.fullName;
   this.address = `${parksData.addresses[0].line1}, ${parksData.addresses[0].city}, ${parksData.addresses[0].stateCode}, ${parksData.addresses[0].postalCode}`;
-  if (!parksData.entranceFees[0].cost) {
-    this.fee = 'no cost found';
-  } else {
-    this.fee = parksData.entranceFees[0].cost;
-  }
-  // this.fee = parksData.entranceFees[0].cost ? parksData.entranceFees[0].cost : 'no cost found';
+  // this.fee = parksData.fees;
+  this.fee = parksData.entranceFees[0].cost ? parksData.entranceFees[0].cost : 'no cost found';
   this.description = parksData.description;
   this.url = parksData.url;
 }
@@ -138,10 +112,8 @@ function handleGetRestaurants(req, res) {
     });
 }
 // ============== Initialization ========================
-
-client.connect()
-  .then(() => {
-    app.listen(PORT, () => console.log(`app is up on port http://localhost:${PORT}`));
-  });
+client.connect().then(() => {
+  app.listen(PORT, () => console.log(`app is up on port http://localhost:${PORT}`)); // this is what starts the server
+});
 
 
