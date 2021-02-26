@@ -28,6 +28,8 @@ we use a Javascript server.js file that utilizes the libraries express and cors 
  -->
  thank you for helping with a debug issue to James Mansour.
  thank you to Ron Dunphy for helping me fix my app. We found the right path for all the data - even if we had to keep moving ports (to 3005) lol. 
+ thank you Dario Thornhill for helping me find the correct variables from the data that comes back (both server and sql)
+ thank you Ron Dunphy for more help on understanding header requests
 
 
 Number and name of feature: 2 GET routes and 2 x json data formatted correctly
@@ -85,5 +87,58 @@ Estimate of time needed to complete: 2 HOUR
 Start time: 8:30PM
 
 Finish time: 10:30PM
+
+Actual time needed to complete: 2 HOUR
+<hr>
+
+Number and name of feature: map finished weather data live
+
+Estimate of time needed to complete: 2 HOUR
+
+Start time: 5:30PM
+
+Finish time: 8:30PM
+
+Actual time needed to complete: 3 HOUR
+
+<hr>
+
+### 02/25/2021 
+
+Number and name of feature: transfer fake data for yelp and movies, API keys, constructor, error handling
+
+Estimate of time needed to complete: 2 HOUR
+
+Start time: 5:30AM
+
+Finish time: 8:30AM
+
+Actual time needed to complete: 3 HOUR
+
+<hr>
+
+### 02/25/2021 
+
+Number and name of feature: fix database call - variable; fix movies variable - find url link
+
+Estimate of time needed to complete: 2 HOUR
+
+Start time: 2:00PM
+
+Finish time: 5:00PM
+
+Actual time needed to complete: 3 HOUR
+
+<hr>
+
+### 02/25/2021 
+
+Number and name of feature: finish up with yelp + pagination
+
+Estimate of time needed to complete: 2 HOUR
+
+Start time: 6:00PM
+
+Finish time: 8:00PM
 
 Actual time needed to complete: 2 HOUR
